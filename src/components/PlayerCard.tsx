@@ -36,49 +36,6 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
     >
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
-          {/* Player Photo Section */}
-          <div 
-            className="relative w-full md:w-48 h-48 md:h-auto bg-muted/50 flex items-center justify-center group cursor-pointer"
-            onClick={() => setIsEditing(true)}
-          >
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={player.summonerName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <ImagePlus className="w-12 h-12" />
-                <span className="text-xs">Adicionar foto</span>
-              </div>
-            )}
-            <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-sm text-foreground">Clique para editar</span>
-            </div>
-            
-            {isEditing && (
-              <div className="absolute inset-0 bg-background/95 p-4 flex flex-col gap-2">
-                <input
-                  type="text"
-                  placeholder="URL da imagem"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full px-3 py-2 bg-muted border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  autoFocus
-                />
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsEditing(false);
-                  }}
-                  className="px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  Salvar
-                </button>
-              </div>
-            )}
-          </div>
 
           {/* Player Info Section */}
           <div className="flex-1 p-6">
@@ -141,6 +98,48 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
                 <div className="text-xs text-muted-foreground mt-1">Esta season</div>
               </div>
             </div>
+          </div>
+          <div 
+            className="relative w-full md:w-56 h-48 md:h-auto min-h-[200px] bg-muted/50 flex items-center justify-center group cursor-pointer"
+            onClick={() => setIsEditing(true)}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={player.summonerName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <ImagePlus className="w-12 h-12" />
+                <span className="text-xs">Adicionar foto</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-sm text-foreground">Clique para editar</span>
+            </div>
+            
+            {isEditing && (
+              <div className="absolute inset-0 bg-background/95 p-4 flex flex-col gap-2">
+                <input
+                  type="text"
+                  placeholder="URL da imagem"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  className="w-full px-3 py-2 bg-muted border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  autoFocus
+                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditing(false);
+                  }}
+                  className="px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Salvar
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
