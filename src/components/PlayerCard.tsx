@@ -1,12 +1,12 @@
-import { PlayerStats } from '@/types/player';
-import { LaneBadge } from '@/components/LaneBadge';
-import { TierBadge } from '@/components/TierBadge';
+import { PlayerWithConfig } from '@/services/riotApi';
+import { LaneBadge } from './LaneBadge';
+import { TierBadge } from './TierBadge';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Swords, Trophy, ImagePlus } from 'lucide-react';
+import { TrendingUp, Trophy, ImagePlus, Gamepad2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface PlayerCardProps {
-  player: PlayerStats;
+  player: PlayerWithConfig;
   index: number;
 }
 
@@ -14,99 +14,32 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
   const [imageUrl, setImageUrl] = useState(player.photoUrl || '');
   const [isEditing, setIsEditing] = useState(false);
 
-  const kda = player.deaths === 0 
-    ? 'Perfect' 
-    : ((player.kills + player.assists) / player.deaths).toFixed(2);
-  
-  const kdaColor = 
-    kda === 'Perfect' || parseFloat(kda) >= 4 
-      ? 'text-tier-emerald' 
-      : parseFloat(kda) >= 3 
-        ? 'text-tier-gold' 
-        : parseFloat(kda) >= 2 
-          ? 'text-foreground' 
-          : 'text-tier-bronze';
+  // Usa dados do Solo Queue, ou Flex se não tiver Solo
+  const queueData = player.soloQueue || player.flexQueue;
+  const queueType = player.soloQueue ? 'Solo/Duo' : player.flexQueue ? 'Flex' : 'Unranked';
 
-  const winRate = ((player.wins / (player.wins + player.losses)) * 100).toFixed(1);
+  const winRate = queueData 
+    ? ((queueData.wins / (queueData.wins + queueData.losses)) * 100).toFixed(1)
+    : '0';
+
+  const totalGames = queueData ? queueData.wins + queueData.losses : 0;
 
   return (
     <Card
-      className="glass-card card-glow overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-primary/50"
+      className="glass-card card-glow overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 animate-in fade-in slide-in-from-bottom-4"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
-
-          {/* Player Info Section */}
-          <div className="flex-1 p-6">
-            {/* Header */}
-            <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-              <div>
-                <h3 className="text-2xl font-bold text-gold-gradient mb-2">
-                  {player.summonerName}
-                </h3>
-                <LaneBadge lane={player.lane} />
-              </div>
-              <TierBadge tier={player.tier} division={player.division} />
-            </div>
-
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* KDA */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
-                <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                  <Swords className="w-4 h-4" />
-                  <span className="text-xs uppercase tracking-wide">KDA</span>
-                </div>
-                <div className={`text-2xl font-bold ${kdaColor}`}>{kda}</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {player.kills}/{player.deaths}/{player.assists}
-                </div>
-              </div>
-
-              {/* Win Rate */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
-                <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                  <Trophy className="w-4 h-4" />
-                  <span className="text-xs uppercase tracking-wide">Win Rate</span>
-                </div>
-                <div className="text-2xl font-bold text-foreground">{winRate}%</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {player.wins}W {player.losses}L
-                </div>
-              </div>
-
-              {/* LP */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
-                <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-xs uppercase tracking-wide">PDL</span>
-                </div>
-                <div className="text-2xl font-bold text-primary">{player.leaguePoints}</div>
-                <div className="text-xs text-muted-foreground mt-1">Pontos de Liga</div>
-              </div>
-
-              {/* Games */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
-                <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                  <Swords className="w-4 h-4" />
-                  <span className="text-xs uppercase tracking-wide">Partidas</span>
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {player.wins + player.losses}
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">Esta season</div>
-              </div>
-            </div>
-          </div>
+          {/* Player Photo Section */}
           <div 
-            className="relative w-full md:w-56 h-48 md:h-auto min-h-[200px] bg-muted/50 flex items-center justify-center group cursor-pointer"
+            className="relative w-full md:w-48 h-48 md:h-auto bg-muted/50 flex items-center justify-center group cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
             {imageUrl ? (
               <img
                 src={imageUrl}
-                alt={player.summonerName}
+                alt={player.gameName}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -138,6 +71,69 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
                 >
                   Salvar
                 </button>
+              </div>
+            )}
+          </div>
+
+          {/* Player Info Section */}
+          <div className="flex-1 p-6">
+            {/* Header */}
+            <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gold-gradient mb-2">
+                  {player.gameName}
+                  <span className="text-muted-foreground font-normal text-lg ml-1">#{player.tagLine}</span>
+                </h3>
+                <div className="flex items-center gap-2">
+                  <LaneBadge lane={player.lane} />
+                  {player.secondaryLane && <LaneBadge lane={player.secondaryLane} />}
+                  <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded">
+                    {queueType}
+                  </span>
+                </div>
+              </div>
+              {queueData && (
+                <TierBadge tier={queueData.tier} division={queueData.rank} />
+              )}
+            </div>
+
+            {queueData ? (
+              /* Stats Grid */
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Win Rate */}
+                <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                    <Trophy className="w-4 h-4" />
+                    <span className="text-xs uppercase tracking-wide">Win Rate</span>
+                  </div>
+                  <div className="text-2xl font-bold text-foreground">{winRate}%</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {queueData.wins}W {queueData.losses}L
+                  </div>
+                </div>
+
+                <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-xs uppercase tracking-wide">PDL</span>
+                  </div>
+                  <div className="text-2xl font-bold text-primary">{queueData.leaguePoints}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Pontos de Liga</div>
+                </div>
+
+                {/* Games */}
+                <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                    <Gamepad2 className="w-4 h-4" />
+                    <span className="text-xs uppercase tracking-wide">Partidas</span>
+                  </div>
+                  <div className="text-2xl font-bold text-foreground">{totalGames}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Esta season</div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>Jogador não ranqueado esta season</p>
               </div>
             )}
           </div>

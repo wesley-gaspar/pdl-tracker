@@ -15,13 +15,12 @@ export function Header() {
           <div className="flex items-center gap-3 mb-4">
             <Trophy className="w-10 h-10 text-primary animate-float" />
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gold-gradient">
-              LoL Stats Tracker
+              Tracker Rei dos Gados
             </h1>
             <Trophy className="w-10 h-10 text-primary animate-float" style={{ animationDelay: '0.5s' }} />
           </div>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
-            Acompanhe as estatísticas dos jogadores de League of Legends.
-            Visualize ranking, KDA, PDL e muito mais.
+            Uma ferramenta para acompanhar o desempenho dos gados no League of Legends
           </p>
         </div>
       </div>

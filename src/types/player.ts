@@ -18,6 +18,7 @@ export interface PlayerStats {
   id: string;
   summonerName: string;
   lane: Lane;
+  secondaryLane: Lane;
   tier: Tier;
   division: Division;
   leaguePoints: number;
