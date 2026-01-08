@@ -1,28 +1,47 @@
-import { PlayerWithConfig } from '@/services/riotApi';
-import { LaneBadge } from './LaneBadge';
-import { TierBadge } from './TierBadge';
-import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Trophy, ImagePlus, Gamepad2 } from 'lucide-react';
-import { useState } from 'react';
+import { PlayerWithConfig } from "@/services/riotApi";
+import { LaneBadge } from "./LaneBadge";
+import { TierBadge } from "./TierBadge";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  TrendingUp,
+  TrendingDown,
+  Trophy,
+  ImagePlus,
+  Gamepad2,
+  Minus,
+} from "lucide-react";
+import { useState } from "react";
+import { formatLPDifference, getLPDifferenceColor } from "@/lib/lpCalculator";
 
-interface PlayerCardProps {
+interface PlayerCardFromApiProps {
   player: PlayerWithConfig;
   index: number;
 }
 
-export function PlayerCard({ player, index }: PlayerCardProps) {
-  const [imageUrl, setImageUrl] = useState(player.photoUrl || '');
+export function PlayerCard({ player, index }: PlayerCardFromApiProps) {
+  const [imageUrl, setImageUrl] = useState(player.photoUrl || "");
   const [isEditing, setIsEditing] = useState(false);
 
   // Usa dados do Solo Queue, ou Flex se não tiver Solo
   const queueData = player.soloQueue || player.flexQueue;
-  const queueType = player.soloQueue ? 'Solo/Duo' : player.flexQueue ? 'Flex' : 'Unranked';
+  const queueType = player.soloQueue
+    ? "Solo/Duo"
+    : player.flexQueue
+    ? "Flex"
+    : "Unranked";
 
-  const winRate = queueData 
+  const winRate = queueData
     ? ((queueData.wins / (queueData.wins + queueData.losses)) * 100).toFixed(1)
-    : '0';
+    : "0";
 
   const totalGames = queueData ? queueData.wins + queueData.losses : 0;
+
+  // LP difference icon and color
+  const getLPIcon = (difference: number) => {
+    if (difference > 0) return <TrendingUp className="w-4 h-4" />;
+    if (difference < 0) return <TrendingDown className="w-4 h-4" />;
+    return <Minus className="w-4 h-4" />;
+  };
 
   return (
     <Card
@@ -32,7 +51,7 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
           {/* Player Photo Section */}
-          <div 
+          <div
             className="relative w-full md:w-48 h-48 md:h-auto bg-muted/50 flex items-center justify-center group cursor-pointer"
             onClick={() => setIsEditing(true)}
           >
@@ -49,9 +68,11 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
               </div>
             )}
             <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-sm text-foreground">Clique para editar</span>
+              <span className="text-sm text-foreground">
+                Clique para editar
+              </span>
             </div>
-            
+
             {isEditing && (
               <div className="absolute inset-0 bg-background/95 p-4 flex flex-col gap-2">
                 <input
@@ -82,11 +103,15 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
               <div>
                 <h3 className="text-2xl font-bold text-gold-gradient mb-2">
                   {player.gameName}
-                  <span className="text-muted-foreground font-normal text-lg ml-1">#{player.tagLine}</span>
+                  <span className="text-muted-foreground font-normal text-lg ml-1">
+                    #{player.tagLine}
+                  </span>
                 </h3>
                 <div className="flex items-center gap-2">
                   <LaneBadge lane={player.lane} />
-                  {player.secondaryLane && <LaneBadge lane={player.secondaryLane} />}
+                  {player.secondaryLane && (
+                    <LaneBadge lane={player.secondaryLane} />
+                  )}
                   <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded">
                     {queueType}
                   </span>
@@ -104,31 +129,60 @@ export function PlayerCard({ player, index }: PlayerCardProps) {
                 <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Trophy className="w-4 h-4" />
-                    <span className="text-xs uppercase tracking-wide">Win Rate</span>
+                    <span className="text-xs uppercase tracking-wide">
+                      Win Rate
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold text-foreground">{winRate}%</div>
+                  <div className="text-2xl font-bold text-foreground">
+                    {winRate}%
+                  </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     {queueData.wins}W {queueData.losses}L
                   </div>
                 </div>
 
+                {/* LP Difference - replaced LP display */}
                 <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
-                    <TrendingUp className="w-4 h-4" />
-                    <span className="text-xs uppercase tracking-wide">PDL</span>
+                    {getLPIcon(queueData.lpDifference)}
+                    <span className="text-xs uppercase tracking-wide">
+                      PDL Saldo
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold text-primary">{queueData.leaguePoints}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Pontos de Liga</div>
+                  <div
+                    className={`text-2xl font-bold ${getLPDifferenceColor(
+                      queueData.lpDifference
+                    )}`}
+                  >
+                    {queueData.hasBaseline
+                      ? formatLPDifference(queueData.lpDifference)
+                      : "—"}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {queueData.hasBaseline
+                      ? queueData.lpDifference > 0
+                        ? "Ganhou"
+                        : queueData.lpDifference < 0
+                        ? "Perdeu"
+                        : "Inalterado"
+                      : "Primeira consulta"}
+                  </div>
                 </div>
 
                 {/* Games */}
                 <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Gamepad2 className="w-4 h-4" />
-                    <span className="text-xs uppercase tracking-wide">Partidas</span>
+                    <span className="text-xs uppercase tracking-wide">
+                      Partidas
+                    </span>
                   </div>
-                  <div className="text-2xl font-bold text-foreground">{totalGames}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Esta season</div>
+                  <div className="text-2xl font-bold text-foreground">
+                    {totalGames}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Esta season
+                  </div>
                 </div>
               </div>
             ) : (
