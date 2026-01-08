@@ -57,6 +57,13 @@ const playersConfig: PlayerConfig[] = [
     lane: "Support",
     secondaryLane: "Top",
   },
+  {
+    gameName: "clonazepane",
+    tagLine: "tremi",
+    lane: "Jungle",
+    secondaryLane: "Support",
+  },
+
   // Adicione mais jogadores aqui conforme necessário
 ];
 
@@ -71,49 +78,55 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background relative">
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-10 pointer-events-none"
+        style={{ backgroundImage: "url('/rei-do-gado.jpg')" }}
+      />
+      <div className="relative z-10">
+        <Header />
 
-      <main className="container pb-16">
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <Loader2 className="w-12 h-12 text-primary animate-spin" />
-            <p className="text-muted-foreground">
-              Carregando dados dos jogadores...
-            </p>
-          </div>
-        )}
+        <main className="container pb-16">
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+              <p className="text-muted-foreground">
+                Carregando dados dos jogadores...
+              </p>
+            </div>
+          )}
 
-        {error && (
-          <div className="text-center py-20">
-            <p className="text-destructive mb-2">Erro ao carregar dados</p>
+          {error && (
+            <div className="text-center py-20">
+              <p className="text-destructive mb-2">Erro ao carregar dados</p>
+              <p className="text-sm text-muted-foreground">
+                {(error as Error).message}
+              </p>
+            </div>
+          )}
+
+          {players && players.length > 0 && (
+            <div className="space-y-6">
+              {players.map((player, index) => (
+                <PlayerCard key={player.puuid} player={player} index={index} />
+              ))}
+            </div>
+          )}
+
+          {players && players.length === 0 && !isLoading && (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground">Nenhum jogador encontrado</p>
+            </div>
+          )}
+
+          {/* Footer info */}
+          <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground">
-              {(error as Error).message}
+              Dados em tempo real da API Riot Games • Solo/Duo Queue
             </p>
           </div>
-        )}
-
-        {players && players.length > 0 && (
-          <div className="space-y-6">
-            {players.map((player, index) => (
-              <PlayerCard key={player.puuid} player={player} index={index} />
-            ))}
-          </div>
-        )}
-
-        {players && players.length === 0 && !isLoading && (
-          <div className="text-center py-20">
-            <p className="text-muted-foreground">Nenhum jogador encontrado</p>
-          </div>
-        )}
-
-        {/* Footer info */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-muted-foreground">
-            Dados em tempo real da API Riot Games • Solo/Duo Queue
-          </p>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
