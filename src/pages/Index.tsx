@@ -16,8 +16,17 @@ const playersConfig: PlayerConfig[] = [
     lane: "Mid",
     secondaryLane: "Jungle",
   },
-  { gameName: "Trinda", tagLine: "sad", lane: "Adc", secondaryLane: "Mid" },
-  { gameName: "vem na mão fdp", tagLine: "br1", lane: "Support" },
+  {
+    gameName: "Trinda",
+    tagLine: "sad",
+    lane: "Adc",
+    secondaryLane: "Mid",
+  },
+  {
+    gameName: "vem na mão fdp",
+    tagLine: "br1",
+    lane: "Support",
+  },
   {
     gameName: "Hacksan",
     tagLine: "kekw",
@@ -25,12 +34,29 @@ const playersConfig: PlayerConfig[] = [
     secondaryLane: "Jungle",
   },
   {
+    gameName: "Soundbr",
+    tagLine: "Sold",
+    lane: "Mid",
+    secondaryLane: "Top",
+  },
+  {
     gameName: "mourasan",
     tagLine: "kekw",
     lane: "Top",
     secondaryLane: "Jungle",
   },
-  { gameName: "é o JZ", tagLine: "amor", lane: "Mid", secondaryLane: "Jungle" },
+  {
+    gameName: "é o JZ",
+    tagLine: "amor",
+    lane: "Mid",
+    secondaryLane: "Jungle",
+  },
+  {
+    gameName: "Tato Safado",
+    tagLine: "tato",
+    lane: "Support",
+    secondaryLane: "Top",
+  },
   // Adicione mais jogadores aqui conforme necessário
 ];
 

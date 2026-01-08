@@ -64,6 +64,7 @@ export const fetchMultiplePlayers = async (
         ...data,
         lane: player.lane,
         photoUrl: player.photoUrl,
+        secondaryLane: player.secondaryLane,
       };
     })
   );
